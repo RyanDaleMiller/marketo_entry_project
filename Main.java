@@ -12,7 +12,8 @@ package com.company;
 import java.io.*;
 import java.util.Scanner;
 // json imports
-import com.github.cliftonlabs.json_simple.*;
+import org.json.simple.*;
+import org.json.simple.parser.JSONParser;
 
 public class Main {
 
@@ -20,7 +21,8 @@ public class Main {
 	// write your code here
         System.out.println("*************\n*Hello World*\n*************\n");
         String filename = getFilename();
-        String fileData = readFile(filename);
+        JSONArray fileData = readJsonFile(filename);
+//        String fileData = readFile(filename);
         if(fileData != null) {
             System.out.println(fileData);
         }
@@ -70,5 +72,13 @@ public class Main {
         }
 
         return results;
+    }
+
+    private static JSONArray readJsonFile(String filename) {
+        JSONParser parser = new JSONParser();
+//        try {
+//            JsonArray jsonData = (JsonArray) parser
+//        }
+        return null;
     }
 }

@@ -12,8 +12,10 @@ package com.company;
 import java.io.*;
 import java.util.Scanner;
 // json imports
+import com.github.cliftonlabs.json_simple.JsonObject;
 import org.json.simple.*;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class Main {
 
@@ -21,13 +23,13 @@ public class Main {
 	// write your code here
         System.out.println("*************\n*Hello World*\n*************\n");
         String filename = getFilename();
-        JSONArray fileData = readJsonFile(filename);
+        JSONObject fileData = readJsonFile(filename);
 //        String fileData = readFile(filename);
         if(fileData != null) {
-            System.out.println(fileData);
+//            System.out.println(fileData);
         }
         else {
-            System.out.println("FAIL");
+            System.out.println("FAILED");
         }
         System.out.println("Thanks!");
     }
@@ -74,11 +76,39 @@ public class Main {
         return results;
     }
 
-    private static JSONArray readJsonFile(String filename) {
+    private static JSONObject readJsonFile(String filename) {
         JSONParser parser = new JSONParser();
-//        try {
-//            JsonArray jsonData = (JsonArray) parser
-//        }
+        JSONObject fileData;
+        try {
+            FileReader reader = new FileReader(filename);
+            fileData = (JSONObject) parser.parse(reader);
+        }
+        catch (FileNotFoundException fileErr) {
+            System.out.println("Could not find file: '"+filename+"'");
+            System.out.println("----------Stack Trace----------");
+            fileErr.printStackTrace();
+            System.out.println("-------------------------------");
+            return null;
+        }
+        catch (IOException ioErr) {
+            System.out.println("IO error");
+            System.out.println("----------Stack Trace----------");
+            ioErr.printStackTrace();
+            System.out.println("-------------------------------");
+            return null;
+        }
+        catch (ParseException parseErr) {
+            System.out.println("Parsing error");
+            System.out.println("----------Stack Trace----------");
+            parseErr.printStackTrace();
+            System.out.println("-------------------------------");
+            return null;
+        }
+        return fileData;
+    }
+
+    private static JSONObject deDuplicate(JsonObject filedata) {
+
         return null;
     }
 }

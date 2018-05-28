@@ -10,7 +10,8 @@
 package com.company;
 // basic imports
 import java.io.*;
-import java.util.Scanner;
+import java.util.*;
+import java.lang.*;
 // json imports
 import com.github.cliftonlabs.json_simple.JsonObject;
 import org.json.simple.*;
@@ -27,6 +28,11 @@ public class Main {
 //        String fileData = readFile(filename);
         if(fileData != null) {
 //            System.out.println(fileData);
+            JSONArray noDupData = deDuplicate(fileData);
+            System.out.println("noDupData:");
+            for(Object o: noDupData) {
+                System.out.println(o);
+            }
         }
         else {
             System.out.println("FAILED");
@@ -107,8 +113,47 @@ public class Main {
         return fileData;
     }
 
-    private static JSONObject deDuplicate(JsonObject filedata) {
+    private static JSONArray deDuplicate(JSONObject filedata) {
+        JSONArray leads = (JSONArray) filedata.get("leads");
+        JSONArray noDups = new JSONArray();
+//        System.out.println(leads);
 
-        return null;
+//        for(Object item: leads) {
+        for(int i = 0; i < leads.size(); i++) {
+            JSONObject lead = (JSONObject) leads.get(i);
+//            System.out.println(lead);
+
+            Boolean duplicate = false;
+//            for(Object tempItem: noDups) {
+            for(int j = 0; j < noDups.size(); j++) {
+                JSONObject temp = (JSONObject) noDups.get(j);
+
+                String leadID = (String) lead.get("_id");
+                String tempID = (String) temp.get("_id");
+
+                String leadEmail = (String) lead.get("email");
+                String tempEmail = (String) temp.get("email");
+
+                if(leadID.equals(tempID) || leadEmail.equals(tempEmail)) {
+                    duplicate = true;
+                    String leadDate = (String) lead.get("entryDate");
+                    String tempDate = (String) temp.get("entryDate");
+                    if(leadDate.compareTo(tempDate) >= 0) {
+                        System.out.println("********************");
+                        System.out.println("Replacing (_id: '" + temp.get("_id") + "'; email: '" + temp.get("email") + "') with -> (_id: '" + lead.get("_id") + "'; email: '" + lead.get("email") + "')");
+                        System.out.println("Entry date updated from '" + temp.get("entryDate") + "' to '" + lead.get("entryDate") + "'");
+                        System.out.println("********************");
+
+                        noDups.remove(temp);
+                        noDups.add(lead);
+                    }
+                    break;
+                }
+            }
+            if (!duplicate) {
+                noDups.add(lead);
+            }
+        }
+        return noDups;
     }
 }

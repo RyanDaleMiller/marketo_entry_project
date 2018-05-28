@@ -1,3 +1,12 @@
+/*
+* Author:   Ryan Miller
+* Email:    ryandmiller37@gmail.com
+*
+* Small homework project from Marketo
+* The program takes in a json and deduplicates it
+* based on an "_id" key and an "email" key
+*/
+
 package com.company;
 // basic imports
 import java.io.*;

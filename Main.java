@@ -13,7 +13,6 @@ import java.io.*;
 import java.util.*;
 import java.lang.*;
 // json imports
-import com.github.cliftonlabs.json_simple.JsonObject;
 import org.json.simple.*;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -21,30 +20,36 @@ import org.json.simple.parser.ParseException;
 public class Main {
 
     public static void main(String[] args) {
-	// write your code here
-        System.out.println("*************\n*Hello World*\n*************\n");
+        // Getting the file name from the user
         String filename = getFilename();
+        // Pulling json data from the file
         JSONObject fileData = readJsonFile(filename);
-//        String fileData = readFile(filename);
         if(fileData != null) {
-//            System.out.println(fileData);
+            // Removing duplicates
             JSONArray noDupData = deDuplicate(fileData);
+            // Showing no duplicate data
+            System.out.println();
             System.out.println("noDupData:");
             for(Object o: noDupData) {
                 System.out.println(o);
             }
+            // Writing new data to file
+            newJsonFile(noDupData);
         }
         else {
             System.out.println("FAILED");
         }
+        System.out.println();
         System.out.println("Thanks!");
     }
 
     public static String getFilename() {
+        System.out.println();
         Scanner reader = new Scanner(System.in);
         System.out.print("What file do you what to deduplicate: ");
         String filename = reader.nextLine();
         reader.close();
+        System.out.println();
         return filename;
     }
 
@@ -88,6 +93,7 @@ public class Main {
         try {
             FileReader reader = new FileReader(filename);
             fileData = (JSONObject) parser.parse(reader);
+            reader.close();
         }
         catch (FileNotFoundException fileErr) {
             System.out.println("Could not find file: '"+filename+"'");
@@ -97,7 +103,7 @@ public class Main {
             return null;
         }
         catch (IOException ioErr) {
-            System.out.println("IO error");
+            System.out.println("Error reading file: '" + filename + "'");
             System.out.println("----------Stack Trace----------");
             ioErr.printStackTrace();
             System.out.println("-------------------------------");
@@ -116,15 +122,10 @@ public class Main {
     private static JSONArray deDuplicate(JSONObject filedata) {
         JSONArray leads = (JSONArray) filedata.get("leads");
         JSONArray noDups = new JSONArray();
-//        System.out.println(leads);
-
-//        for(Object item: leads) {
         for(int i = 0; i < leads.size(); i++) {
             JSONObject lead = (JSONObject) leads.get(i);
-//            System.out.println(lead);
 
             Boolean duplicate = false;
-//            for(Object tempItem: noDups) {
             for(int j = 0; j < noDups.size(); j++) {
                 JSONObject temp = (JSONObject) noDups.get(j);
 
@@ -155,5 +156,21 @@ public class Main {
             }
         }
         return noDups;
+    }
+
+    private static void newJsonFile(JSONArray data) {
+        JSONObject leads = new JSONObject();
+        leads.put("leads", data);
+        try {
+            FileWriter writer = new FileWriter("noDuplicateLeads.json");
+            leads.writeJSONString(writer);
+            writer.close();
+        }
+        catch (IOException ioErr) {
+            System.out.println("Error writing to file 'noDuplicateLeads.json'");
+            System.out.println("----------------Stacktrace----------------");
+            ioErr.printStackTrace();
+            System.out.println("------------------------------------------");
+        }
     }
 }

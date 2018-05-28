@@ -53,40 +53,6 @@ public class Main {
         return filename;
     }
 
-    public static String readFile(String filename) {
-        String results = "";
-
-        try {
-            FileReader fileR = new FileReader(filename);
-            BufferedReader buffR = new BufferedReader(fileR);
-            StringBuilder stringB = new StringBuilder();
-
-            String line = buffR.readLine();
-            while(line != null) {
-                stringB.append(line);
-                line = buffR.readLine();
-            }
-
-            results = stringB.toString();
-        }
-        catch(FileNotFoundException fileErr) {
-            System.out.println("Unable to access '" + filename + "'");
-            System.out.println("----------------Stacktrace----------------");
-            fileErr.printStackTrace();
-            System.out.println("------------------------------------------");
-            return null;
-        }
-        catch(IOException ioErr) {
-            System.out.println("Error reading file '" + filename + "'");
-            System.out.println("----------------Stacktrace----------------");
-            ioErr.printStackTrace();
-            System.out.println("------------------------------------------");
-            return null;
-        }
-
-        return results;
-    }
-
     private static JSONObject readJsonFile(String filename) {
         JSONParser parser = new JSONParser();
         JSONObject fileData;
@@ -119,8 +85,10 @@ public class Main {
         return fileData;
     }
 
-    private static JSONArray deDuplicate(JSONObject filedata) {
-        JSONArray leads = (JSONArray) filedata.get("leads");
+    private static JSONArray deDuplicate(JSONObject fileData) {
+        // Getting the leads as an array
+        JSONArray leads = (JSONArray) fileData.get("leads");
+        // New array that will hold non-duplicates
         JSONArray noDups = new JSONArray();
         for(int i = 0; i < leads.size(); i++) {
             JSONObject lead = (JSONObject) leads.get(i);
@@ -135,10 +103,12 @@ public class Main {
                 String leadEmail = (String) lead.get("email");
                 String tempEmail = (String) temp.get("email");
 
+                // Duplicates are defined by if the '_id' or 'email' keys are the same
                 if(leadID.equals(tempID) || leadEmail.equals(tempEmail)) {
                     duplicate = true;
                     String leadDate = (String) lead.get("entryDate");
                     String tempDate = (String) temp.get("entryDate");
+                    // Keeping the latest entryDate or last listed entry
                     if(leadDate.compareTo(tempDate) >= 0) {
                         System.out.println("********************");
                         System.out.println("Replacing (_id: '" + temp.get("_id") + "'; email: '" + temp.get("email") + "') with -> (_id: '" + lead.get("_id") + "'; email: '" + lead.get("email") + "')");
@@ -159,6 +129,7 @@ public class Main {
     }
 
     private static void newJsonFile(JSONArray data) {
+        // Putting the data back into original format
         JSONObject leads = new JSONObject();
         leads.put("leads", data);
         try {
